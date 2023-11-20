@@ -1,0 +1,13 @@
+CREATE DATABASE rh2;
+USE rh2;
+
+CREATE TABLE Funcionarios(
+	matricula INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL,
+    sexo CHAR NOT NULL,
+    idade INT NOT NULL,
+    salario DOUBLE,
+    PRIMARY KEY (matricula)
+);
+
+SELECT * FROM Funcionarios
