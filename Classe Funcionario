@@ -1,57 +1,49 @@
-package models;
+package Models;
 
-public class Funcionarios {
-    int Matricula;
-    String Nome;
-    String Sexo;
-    int Idade;
-    double Salario;
+public class Funcionario {
+    private int matricula;
+    private String nome;
+    private String sexo;
+    private int idade;
+    private double salario;
 
-    public Funcionarios(int matricula, String nome, String sexo, int idade, double salario) {
-        this.Matricula = matricula;
-        this.Nome = nome;
-        this.Sexo = sexo;
-        this.Idade = idade;
-        this.Salario = salario;
+    public Funcionario(int matricula, String nome, String sexo, int idade, double salario) {
+        this.matricula = matricula;
+        this.nome = nome;
+        this.sexo = sexo;
+        this.idade = idade;
+        this.salario = salario;
     }
 
     public int getMatricula() {
-        return Matricula;
-    }
-
-    public void setMatricula(int matricula) {
-        this.Matricula = matricula;
+        return matricula;
     }
 
     public String getNome() {
-        return Nome;
-    }
-
-    public void setNome(String nome) {
-        this.Nome = nome;
+        return nome;
     }
 
     public String getSexo() {
-        return Sexo;
-    }
-
-    public void setSexo(String sexo) {
-        this.Sexo = sexo;
+        return sexo;
     }
 
     public int getIdade() {
-        return Idade;
-    }
-
-    public void setIdade(int idade) {
-        this.Idade = idade;
+        return idade;
     }
 
     public double getSalario() {
-        return Salario;
+        return salario;
     }
 
-    public void setSalario(double salario) {
-        this.Salario = salario;
+    public double calcularSalarioPorHora() {
+        int horasPorSemana = 40;
+        return salario / horasPorSemana;
     }
+
+    public double calcularPericulosidade() {
+        // Vamos assumir que a periculosidade é equivalente a 30% do salário
+        double percentualPericulosidade = 0.3;
+        return salario * percentualPericulosidade;
+    }
+
 }
