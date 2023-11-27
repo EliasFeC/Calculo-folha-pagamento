@@ -1,0 +1,66 @@
+import java.sql.Connection;
+import Models.Funcionario;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static java.sql.DriverManager.getConnection;
+
+public class Main {
+
+    private static final String URL = "jdbc:mysql://localhost:3306/rh";
+    private static final String USUARIO = "root";
+    private static final String SENHA = "12345";
+
+    public static void cadastrarFuncionario(Funcionario funcionario) {
+        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salario) VALUES (?, ?, ?, ?, ?)";
+
+        try (
+                Connection connection = getConnection(URL, USUARIO, SENHA);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setInt(1, funcionario.getMatricula());
+            preparedStatement.setString(2, funcionario.getNome());
+            preparedStatement.setString(3, funcionario.getSexo());
+            preparedStatement.setInt(4, funcionario.getIdade());
+            preparedStatement.setDouble(5, funcionario.getSalario());
+
+            int linhasAfetadas = preparedStatement.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("Funcionário cadastrado com sucesso!");
+            } else {
+                System.out.println("Erro ao cadastrar o funcionário.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void excluirFuncionario(int matricula) {
+        String sql = "DELETE FROM funcionarios WHERE matricula = ?";
+
+        try (
+                Connection connection = getConnection(URL, USUARIO, SENHA);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setInt(1, matricula);
+
+            int linhasAfetadas = preparedStatement.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("Funcionário excluído com sucesso!");
+            } else {
+                System.out.println("Nenhum funcionário encontrado com a matrícula fornecida.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5000.00);
+        // cadastrarFuncionario(funcionario);
+        // excluirFuncionario(1);
+    }
+}
