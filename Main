@@ -1,8 +1,6 @@
-import java.sql.Connection;
+import java.sql.*;
+
 import Models.Funcionario;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -58,9 +56,90 @@ public class Main {
         }
     }
 
+    public static void atualizarFuncionario(Funcionario funcionario) {
+        String sql = "UPDATE funcionarios SET nome = ?, sexo = ?, idade = ?, salario = ? WHERE matricula = ?";
+
+        try (
+                Connection connection = DriverManager.getConnection(URL, USUARIO, SENHA);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setString(1, funcionario.getNome());
+            preparedStatement.setString(2, funcionario.getSexo());
+            preparedStatement.setInt(3, funcionario.getIdade());
+            preparedStatement.setDouble(4, funcionario.getSalario());
+            preparedStatement.setInt(5, funcionario.getMatricula());
+
+            int linhasAfetadas = preparedStatement.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("Funcionário atualizado com sucesso!");
+            } else {
+                System.out.println("Nenhum funcionário encontrado com a matrícula fornecida.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Funcionario buscarFuncionarioPorMatricula(int matricula) {
+        String sql = "SELECT * FROM funcionarios WHERE matricula = ?";
+
+        try (
+                Connection connection = DriverManager.getConnection(URL, USUARIO, SENHA);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setInt(1, matricula);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int matriculaRetornada = ((ResultSet) resultSet).getInt("matricula");
+                String nome = resultSet.getString("nome");
+                String sexo = resultSet.getString("sexo");
+                int idade = resultSet.getInt("idade");
+                double salario = resultSet.getDouble("salario");
+
+                return new Funcionario(matriculaRetornada, nome, sexo, idade, salario);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+
     public static void main(String[] args) {
-        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5000.00);
-        // cadastrarFuncionario(funcionario);
+
+        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5000.00); cadastrarFuncionario(funcionario);
+
         // excluirFuncionario(1);
+
+        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5500.00); atualizarFuncionario(funcionario);
+
+        /*
+        int matriculaBusca = 1;
+        Funcionario funcionario = buscarFuncionarioPorMatricula(matriculaBusca);
+
+        if (funcionario != null) {
+            double salarioPorHora = funcionario.calcularSalarioPorHora();
+            System.out.println("O salário por hora do funcionário é: " + salarioPorHora);
+        } else {
+            System.out.println("Funcionário não encontrado.");
+        }
+        */
+
+        /*
+        int matriculaBusca = 1; // Substitua pelo número de matrícula do funcionário desejado
+        Funcionario funcionario = buscarFuncionarioPorMatricula(matriculaBusca);
+
+        if (funcionario != null) {
+            double valorPericulosidade = funcionario.calcularPericulosidade();
+            System.out.println("O valor da periculosidade do funcionário é: " + valorPericulosidade);
+        } else {
+            System.out.println("Funcionário não encontrado.");
+        }
+        */
     }
 }
