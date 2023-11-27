@@ -1,13 +1,12 @@
-CREATE DATABASE rh2;
-USE rh2;
+CREATE DATABASE rh;
+USE rh;
 
-CREATE TABLE Funcionarios(
-	matricula INT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(50) NOT NULL,
-    sexo CHAR NOT NULL,
-    idade INT NOT NULL,
-    salario DOUBLE,
-    PRIMARY KEY (matricula)
+CREATE TABLE funcionarios (
+    matricula INT PRIMARY KEY,
+    nome VARCHAR(50),
+    sexo CHAR(1),
+    idade INT,
+    salario DECIMAL(10, 2)
 );
 
-SELECT * FROM Funcionarios
+SELECT * FROM funcionarios
