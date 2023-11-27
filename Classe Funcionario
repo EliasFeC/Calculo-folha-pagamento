@@ -1,4 +1,4 @@
-package Models;
+package models;
 
 public class Funcionarios {
     int Matricula;
@@ -35,7 +35,7 @@ public class Funcionarios {
         return Sexo;
     }
 
-    public void setSexo(char sexo) {
+    public void setSexo(String sexo) {
         this.Sexo = sexo;
     }
 
@@ -55,4 +55,3 @@ public class Funcionarios {
         this.Salario = salario;
     }
 }
-
