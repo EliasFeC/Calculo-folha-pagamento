@@ -1,4 +1,4 @@
-import Models.Funcionarios;
+import models.Funcionarios;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class Main {
      * estabelecer a conexão com o banco de dados MySQL.
      * @see <a href="https://github.com/mysql/mysql-connector-j">Repositório MySQL Connector/J</a>
      */
-    static void carregarDriverMySql() {
+    static void carregarDriverMySql() throws RuntimeException {
 
         try {
 
@@ -59,40 +59,32 @@ public class Main {
 
     /**
      * Adiciona um novo registro no banco de dados
-     * @param funcionarios o novo produto que será adicionado
+     * @param
      * @return o id do cliente recém-criado ou -1 em caso de erro
      */
-    static int inserirFuncionario(Funcionarios funcionarios) {
+    public static void cadastrarFuncionario(Funcionarios funcionario) {
+        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salario) VALUES (?, ?, ?, ?, ?)";
 
-        int Matricula = -1;
-        String query = "INSERT INTO Funcionarios(Matricula, Nome, Sexo, Idade, Salario) VALUES (?, ?, ?, ?, ? );";
+        try (
+                Connection connection = DriverManager.getConnection(URL_BD, USUARIO_BD, SENHA_BD);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
+            preparedStatement.setInt(1, funcionario.getMatricula());
+            preparedStatement.setString(2, funcionario.getNome());
+            preparedStatement.setString(3, funcionario.getSexo());
+            preparedStatement.setInt(4, funcionario.getIdade());
+            preparedStatement.setDouble(5, funcionario.getSalario());
 
-        try (Connection conexao = criarConexao()) {
+            int linhasAfetadas = preparedStatement.executeUpdate();
 
-            PreparedStatement comando = conexao.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            comando.setInt(1, funcionarios.getMatricula());
-            comando.setString(2, funcionarios.getNome());
-            comando.setString(3, funcionarios.getSexo());
-            comando.setInt(4, funcionarios.getIdade());
-            comando.setDouble(5, funcionarios.getSalario());
-
-            int linhasAfetadas = comando.executeUpdate();
-
-            if (linhasAfetadas == 1) {
-
-                ResultSet resultado = comando.getGeneratedKeys();
-
-                while (resultado.next())
-                    Matricula = resultado.getInt(1);
-
+            if (linhasAfetadas > 0) {
+                System.out.println("Funcionário cadastrado com sucesso!");
+            } else {
+                System.out.println("Erro ao cadastrar o funcionário.");
             }
-
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
-
-        return Matricula;
-
     } // Fim do método inserirFuncionario()
 
 
@@ -116,7 +108,7 @@ public class Main {
 
             while (resultado.next()) {
 
-                int Matricula = resultado.getInt("Matricula");
+                Matricula = resultado.getInt("Matricula");
                 String Nome = resultado.getString("Nome");
                 String Sexo = resultado.getString("Sexo");
                 int Idade = resultado.getInt("Idade");
@@ -155,7 +147,7 @@ public class Main {
                 int Idade = resultado.getInt("Idade");
                 double Salario = resultado.getDouble("Salario");
 
-                funcionarios.add(new Funcionarios(Matricula, Nome, Sexo, Idade, Salario);
+                funcionarios.add(new Funcionarios(Matricula, Nome, Sexo, Idade, Salario));
 
             }
 
@@ -241,7 +233,7 @@ public class Main {
      * Exibe na tela informações de um departamento
      * @param f
      */
-    static void mostrarDepartamento(Funcionarios f) {
+    static void mostrarFuncionarios(Funcionarios f) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -256,28 +248,20 @@ public class Main {
     } // Fim do método mostrarFuncionario
 
 
-    static void mostrarTodosDepartamentos(ArrayList<Departamento> departamentos) {
+    static void mostrarTodosFuncionarios(ArrayList<Funcionarios> funcionarios) {
 
         System.out.println();
 
-        for (Departamento d : departamentos)
-            mostrarDepartamento(d);
+        for (Funcionarios f : funcionarios)
+            mostrarFuncionarios(f);
 
     }
 
     public static void main(String[] args) {
 
         carregarDriverMySql();
-
-        Departamento vendas = new Departamento(1, "Vendas", "Responsável pela venda de produtos");
-        Departamento rh = new Departamento(2, "RH", "Responsável pela gestão de recursos humanos");
-        Departamento marketing = new Departamento(3, "Marketing", "Responsável pela promoção e divulgação da empresa");
-        Departamento financeiro = new Departamento(4, "Financeiro", "Responsável pela gestão financeira da empresa");
-
-        Departamento ti = new Departamento("TI", "Responsável pela infraestrutura tecnológica e suporte técnico");
-        Departamento logistica = new Departamento( "Logística", "Responsável pelo planejamento e execução das operações logísticas");
-        Departamento ped = new Departamento( "Pesquisa e Desenvolvimento", "Responsável pela inovação e criação de novos produtos");
-
+        Funcionarios funcionario = new Funcionarios(1, "João Silva", "M", 30, 5000.00);
+        cadastrarFuncionario(funcionario);
         /**********************************************************************************
          *                               TESTANDO O CRUD                                  *
          * CRUD são as quatro operações básicas utilizadas em bancos de dados relacionais *
@@ -286,48 +270,9 @@ public class Main {
 
         // CREATE: vamos cadastrar, adicionar, inserir ou salvar um registro no banco de dados.
         // Após adicionar registros, comente as linhas para não criar linhas duplicadas (repetidas)
-        // int idVendas = inserirDepartamento(vendas);
-        // int idRh = inserirDepartamento(rh);
-        // int idMarketing = inserirDepartamento(marketing);
-        // int idFinanceiro = inserirDepartamento(financeiro);
-        // int idTi = inserirDepartamento(ti);
-        // int idLogistica = inserirDepartamento(logistica);
-        // int idPed = inserirDepartamento(ped);
-
-        // READ: vamos Ler, recuperar ou selecionar os dados no banco de dados.
-        Departamento dptoVendas = buscarDepartamento(1);
-        mostrarDepartamento(dptoVendas);
-
-        ArrayList<Departamento> departamentos = buscarTodosDepartamentos();
-        mostrarTodosDepartamentos(departamentos);
-
-        // UPDATE: vamos atualizar, modificar ou alterar um registro no banco de dados.
-        // Suponha que o departamento de Vendas vai se unificar com o Marketing se tornando Marketing e Vendas
-        Departamento dptomarketing = buscarDepartamento(3);
-        System.out.println("Marketing antes");
-        mostrarDepartamento(dptomarketing);
-
-        // atualização
-        dptomarketing.setNome("Marketing e Vendas");
-        dptomarketing.setDescricao("Responsável pela divulgação e vendas!");
-
-        // atualizarDepartamento(dptomarketing);
-
-        System.out.println("Depois da atualização");
-        Departamento marketingAtualizado = buscarDepartamento(3);
-        mostrarDepartamento(marketingAtualizado);
-
-
-        // DELETE: vamos excluir, remover ou apagar um registro no banco de dados.
-        // Após atualizar o departamento de marketing vamos apagar o departamento de vendas porque ele se unificou com marketing
-
-        boolean excluido = excluirDepartamento(1);
-        System.out.println("Departamento excluido? " + excluido);
-
-        departamentos.clear();
-        departamentos = buscarTodosDepartamentos();
-        mostrarTodosDepartamentos(departamentos);
 
 
     }
+
+
 }
