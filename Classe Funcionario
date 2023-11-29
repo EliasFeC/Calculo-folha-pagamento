@@ -5,10 +5,11 @@ public class Funcionario {
     private String nome;
     private String sexo;
     private int idade;
-    private double salarioBruto;
+    private static double salarioBruto;
     private double salarioLiquido;
     private double insalubridade;
     private String grauInsalubridade;
+
 
     public Funcionario(int matricula, String nome, String sexo, int idade, double salarioBruto) {
         this.matricula = matricula;
@@ -148,8 +149,30 @@ public class Funcionario {
         return descontoINSS;
     }
 
+    public static double calcularFGTS() {
+        double percentualFGTS = 0.08;
+        return salarioBruto * percentualFGTS;
+    }
 
-    public static double calcularSalarioLiquido(Funcionario funcionario) {
+    public double calcularDescontoIRRF() {
+        double salarioBase = salarioBruto - calcularDescontoINSS();
+        double baseCalculo = salarioBase;
+
+        if (baseCalculo <= 1903.98) {
+            return 0.0;
+        } else if (baseCalculo <= 2826.65) {
+            return (baseCalculo * 0.075) - 142.80;
+        } else if (baseCalculo <= 3751.05) {
+            return (baseCalculo * 0.15) - 354.80;
+        } else if (baseCalculo <= 4664.68) {
+            return (baseCalculo * 0.225) - 636.13;
+        } else {
+            return (baseCalculo * 0.275) - 869.36;
+        }
+    }
+
+    public static double calcularSalarioLiquido(Funcionario funcionario, boolean incluirFGTS) {
+        double impostos = funcionario.getSalarioBruto() * 0.10;
         double periculosidade = funcionario.calcularPericulosidade();
         double insalubridade = funcionario.calcularInsalubridade();
         double descontoValeTransporte = funcionario.calcularDescontoValeTransporte();
@@ -157,11 +180,16 @@ public class Funcionario {
         double descontoINSS = funcionario.calcularDescontoINSS();
 
         double salarioBrutoComInsalubridade = funcionario.getSalarioBruto() + insalubridade;
-        double salarioLiquido = salarioBrutoComInsalubridade + periculosidade - descontoValeTransporte;
+        double salarioLiquido = salarioBrutoComInsalubridade - impostos + periculosidade - descontoValeTransporte;
 
         salarioLiquido += valeAlimentacao;
 
         salarioLiquido -= descontoINSS;
+
+        if (incluirFGTS) {
+            double fgts = funcionario.calcularFGTS();
+            salarioLiquido += fgts;
+        }
 
         return salarioLiquido;
     }
