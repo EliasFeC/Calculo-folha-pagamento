@@ -124,14 +124,45 @@ public class Funcionario {
         }
     }
 
-    public static double calcularSalarioLiquido(Funcionario funcionario) {
+    public double calcularValeAlimentacao() {
+        double percentualValeAlimentacao = 0.05; // Exemplo: 5% do salário bruto
+        return salarioBruto * percentualValeAlimentacao;
+    }
 
+    public double calcularDescontoINSS() {
+        double salarioBruto = this.salarioBruto;
+        double descontoINSS = 0.0;
+
+        if (salarioBruto <= 1302.00) {
+            descontoINSS = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2571.29) {
+            descontoINSS = salarioBruto * 0.09;
+        } else if (salarioBruto <= 3856.94) {
+            descontoINSS = salarioBruto * 0.12;
+        } else if (salarioBruto <= 7507.49) {
+            descontoINSS = salarioBruto * 0.14;
+        } else {
+            descontoINSS = 7507.49 * 0.14;
+        }
+
+        return descontoINSS;
+    }
+
+
+    public static double calcularSalarioLiquido(Funcionario funcionario) {
         double periculosidade = funcionario.calcularPericulosidade();
         double insalubridade = funcionario.calcularInsalubridade();
         double descontoValeTransporte = funcionario.calcularDescontoValeTransporte();
+        double valeAlimentacao = funcionario.calcularValeAlimentacao();
+        double descontoINSS = funcionario.calcularDescontoINSS();
 
         double salarioBrutoComInsalubridade = funcionario.getSalarioBruto() + insalubridade;
+        double salarioLiquido = salarioBrutoComInsalubridade + periculosidade - descontoValeTransporte;
 
-        return salarioBrutoComInsalubridade + periculosidade - descontoValeTransporte;
+        salarioLiquido += valeAlimentacao;
+
+        salarioLiquido -= descontoINSS;
+
+        return salarioLiquido;
     }
 }
