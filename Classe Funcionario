@@ -5,14 +5,17 @@ public class Funcionario {
     private String nome;
     private String sexo;
     private int idade;
-    private double salario;
+    private double salarioBruto;
+    private double salarioLiquido;
+    private double insalubridade;
+    private String grauInsalubridade;
 
-    public Funcionario(int matricula, String nome, String sexo, int idade, double salario) {
+    public Funcionario(int matricula, String nome, String sexo, int idade, double salarioBruto) {
         this.matricula = matricula;
         this.nome = nome;
         this.sexo = sexo;
         this.idade = idade;
-        this.salario = salario;
+        this.salarioBruto = salarioBruto;
     }
 
     public int getMatricula() {
@@ -31,19 +34,104 @@ public class Funcionario {
         return idade;
     }
 
-    public double getSalario() {
-        return salario;
+    public double getSalarioBruto() {
+        return salarioBruto;
+    }
+
+    public void setSalarioBruto(double salarioBruto) {
+        this.salarioBruto = salarioBruto;
+    }
+
+    public double getSalarioLiquido() {
+        return salarioLiquido;
+    }
+
+    public void setSalarioLiquido(double salarioLiquido) {
+        this.salarioLiquido = salarioLiquido;
+    }
+
+    public double getInsalubridade() {
+        return insalubridade;
+    }
+
+    public void setInsalubridade(double insalubridade) {
+        this.insalubridade = insalubridade;
+    }
+
+    public String getGrauInsalubridade() {
+        return grauInsalubridade;
+    }
+
+    public void setGrauInsalubridade(String grauInsalubridade) {
+        this.grauInsalubridade = grauInsalubridade;
+    }
+
+    public double getValorValeTransporteRecebido() {
+        return valorValeTransporteRecebido;
+    }
+
+    public void setValorValeTransporteRecebido(double valorValeTransporteRecebido) {
+        this.valorValeTransporteRecebido = valorValeTransporteRecebido;
     }
 
     public double calcularSalarioPorHora() {
         int horasPorSemana = 40;
-        return salario / horasPorSemana;
+        return salarioBruto / horasPorSemana;
     }
 
     public double calcularPericulosidade() {
-        // Vamos assumir que a periculosidade é equivalente a 30% do salário
         double percentualPericulosidade = 0.3;
-        return salario * percentualPericulosidade;
+        return salarioBruto * percentualPericulosidade;
     }
 
+
+    public double calcularInsalubridade() {
+        double percentualInsalubridade = 0.0;
+
+        if (grauInsalubridade != null) {
+            switch (grauInsalubridade.toLowerCase()) {
+                case "baixo":
+                    percentualInsalubridade = 0.10;
+                    break;
+                case "médio":
+                    percentualInsalubridade = 0.20;
+                    break;
+                case "alto":
+                    percentualInsalubridade = 0.40;
+                    break;
+            }
+        }
+
+        return salarioBruto * percentualInsalubridade;
+    }
+
+    private double valorValeTransporteRecebido;
+    public void inserirValeTransporte(double valorRecebido) {
+        if (valorRecebido >= 0) {
+            this.valorValeTransporteRecebido = valorRecebido;
+        } else {
+            System.out.println("Erro: O valor recebido de vale transporte não pode ser negativo.");
+        }
+    }
+
+    public double calcularDescontoValeTransporte() {
+        double percentualDesconto = 0.06;
+
+        if (valorValeTransporteRecebido < percentualDesconto * salarioBruto) {
+            return valorValeTransporteRecebido;
+        } else {
+            return salarioBruto * percentualDesconto;
+        }
+    }
+
+    public static double calcularSalarioLiquido(Funcionario funcionario) {
+
+        double periculosidade = funcionario.calcularPericulosidade();
+        double insalubridade = funcionario.calcularInsalubridade();
+        double descontoValeTransporte = funcionario.calcularDescontoValeTransporte();
+
+        double salarioBrutoComInsalubridade = funcionario.getSalarioBruto() + insalubridade;
+
+        return salarioBrutoComInsalubridade + periculosidade - descontoValeTransporte;
+    }
 }
