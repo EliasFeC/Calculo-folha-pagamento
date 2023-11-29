@@ -1,8 +1,9 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Scanner;
 import Models.Funcionario;
 
-import static Models.Funcionario.calcularSalarioLiquido;
 import static java.sql.DriverManager.getConnection;
 
 public class Main {
@@ -12,7 +13,7 @@ public class Main {
     private static final String SENHA = "12345";
 
     public static void cadastrarFuncionario(Funcionario funcionario) {
-        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salarioBruto) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salarioBruto, grauInsalubridade) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (
                 Connection connection = DriverManager.getConnection(URL, USUARIO, SENHA);
@@ -23,6 +24,8 @@ public class Main {
             preparedStatement.setString(3, funcionario.getSexo());
             preparedStatement.setInt(4, funcionario.getIdade());
             preparedStatement.setDouble(5, funcionario.getSalarioBruto());
+            preparedStatement.setString(6, funcionario.getGrauInsalubridade().toLowerCase());
+
 
             int linhasAfetadas = preparedStatement.executeUpdate();
 
@@ -100,7 +103,14 @@ public class Main {
                 int idade = resultSet.getInt("idade");
                 double salarioBruto = resultSet.getDouble("salarioBruto");
 
-                return new Funcionario(matriculaRetornada, nome, sexo, idade, salarioBruto);
+                // aqui voce cria um novo objeto
+                Funcionario f = new Funcionario(matriculaRetornada, nome, sexo, idade, salarioBruto);
+                // aqui seto a insalubridade da busca
+                // ai aqui tava ficando null pq quando ia no banco de dados nao tinha valor ai agora salva lá tambem
+                f.setGrauInsalubridade(resultSet.getString("grauInsalubridade"));
+
+
+                return f;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,6 +140,24 @@ public class Main {
         }
     }
 
+    /**
+     * Método de escrita do prompt e devoluçao de um valor em string
+     * @param prompt
+     * @return
+     */
+    private static String getInput(String prompt){
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+
+        System.out.print(prompt);
+        System.out.flush();
+
+        try{
+            return stdin.readLine();
+        } catch (Exception e){
+            return "Error: " + e.getMessage();
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -145,20 +173,11 @@ public class Main {
 
             switch (escolha) {
                 case 1:
-                    System.out.println("Digite a matrícula do funcionário:");
-                    int matricula = scanner.nextInt();
-
-                    System.out.println("Digite o nome do funcionário:");
-                    String nome = scanner.next();
-
-                    System.out.println("Digite o sexo do funcionário (M/F):");
-                    String sexo = scanner.next();
-
-                    System.out.println("Digite a idade do funcionário:");
-                    int idade = scanner.nextInt();
-
-                    System.out.println("Digite o salário bruto do funcionário:");
-                    double salarioBruto = scanner.nextDouble();
+                    int matricula = Integer.parseInt(getInput("Digite a matrícula do funcionário:"));
+                    String nome = getInput("Digite o nome do funcionário:");
+                    String sexo = getInput("Digite o sexo do funcionário (M/F):");
+                    int idade = Integer.parseInt(getInput("Digite a idade do funcionário:"));
+                    double salarioBruto = Double.parseDouble(getInput("Digite o salário bruto do funcionário:"));
 
                     Funcionario funcionario = new Funcionario(matricula, nome, sexo, idade, salarioBruto);
 
@@ -218,19 +237,19 @@ public class Main {
                         System.out.println("Salário Bruto: " + funcionarioBusca.getSalarioBruto());
 
                         double valeAlimentacao = funcionarioBusca.calcularValeAlimentacao();
-                        System.out.println("Vale Alimentação: " + valeAlimentacao);
+                        System.out.printf("Vale Alimentação: R$ %.2f \n", valeAlimentacao);
 
                         double descontoINSS = funcionarioBusca.calcularDescontoINSS();
-                        System.out.println("Desconto de INSS: " + descontoINSS);
+                        System.out.printf("Desconto de INSS: R$ %.2f \n", descontoINSS);
 
                         double descontoIRRF = funcionarioBusca.calcularDescontoIRRF();
-                        System.out.println("Desconto de IRRF: " + descontoIRRF);
+                        System.out.printf("Desconto de IRRF: R$ %.2f \n", descontoIRRF);
 
                         double salarioLiquidoSemFGTS = Funcionario.calcularSalarioLiquido(funcionarioBusca, false);
-                        System.out.println("Salário Líquido sem FGTS: " + salarioLiquidoSemFGTS);
+                        System.out.printf("Salário Líquido sem FGTS: R$ %.2f \n",  salarioLiquidoSemFGTS);
 
                         double salarioLiquidoComFGTS = Funcionario.calcularSalarioLiquido(funcionarioBusca, true);
-                        System.out.println("Salário Líquido com FGTS: " + salarioLiquidoComFGTS);
+                        System.out.printf("Salário Líquido com FGTS: R$ %.2f \n",  salarioLiquidoComFGTS);
 
                         double salarioPorHora = funcionarioBusca.calcularSalarioPorHora();
                         System.out.println("Salário por Hora: " + salarioPorHora);
