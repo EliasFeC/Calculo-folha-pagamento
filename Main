@@ -1,7 +1,8 @@
 import java.sql.*;
-
+import java.util.Scanner;
 import Models.Funcionario;
 
+import static Models.Funcionario.calcularSalarioLiquido;
 import static java.sql.DriverManager.getConnection;
 
 public class Main {
@@ -11,17 +12,17 @@ public class Main {
     private static final String SENHA = "12345";
 
     public static void cadastrarFuncionario(Funcionario funcionario) {
-        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salario) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO funcionarios (matricula, nome, sexo, idade, salarioBruto) VALUES (?, ?, ?, ?, ?)";
 
         try (
-                Connection connection = getConnection(URL, USUARIO, SENHA);
+                Connection connection = DriverManager.getConnection(URL, USUARIO, SENHA);
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setInt(1, funcionario.getMatricula());
             preparedStatement.setString(2, funcionario.getNome());
             preparedStatement.setString(3, funcionario.getSexo());
             preparedStatement.setInt(4, funcionario.getIdade());
-            preparedStatement.setDouble(5, funcionario.getSalario());
+            preparedStatement.setDouble(5, funcionario.getSalarioBruto());
 
             int linhasAfetadas = preparedStatement.executeUpdate();
 
@@ -57,16 +58,16 @@ public class Main {
     }
 
     public static void atualizarFuncionario(Funcionario funcionario) {
-        String sql = "UPDATE funcionarios SET nome = ?, sexo = ?, idade = ?, salario = ? WHERE matricula = ?";
+        String sql = "UPDATE funcionarios SET nome = ?, sexo = ?, idade = ?, salarioBruto = ? WHERE matricula = ?";
 
         try (
-                Connection connection = DriverManager.getConnection(URL, USUARIO, SENHA);
+                Connection connection = getConnection(URL, USUARIO, SENHA);
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setString(1, funcionario.getNome());
             preparedStatement.setString(2, funcionario.getSexo());
             preparedStatement.setInt(3, funcionario.getIdade());
-            preparedStatement.setDouble(4, funcionario.getSalario());
+            preparedStatement.setDouble(4, funcionario.getSalarioBruto());
             preparedStatement.setInt(5, funcionario.getMatricula());
 
             int linhasAfetadas = preparedStatement.executeUpdate();
@@ -97,9 +98,9 @@ public class Main {
                 String nome = resultSet.getString("nome");
                 String sexo = resultSet.getString("sexo");
                 int idade = resultSet.getInt("idade");
-                double salario = resultSet.getDouble("salario");
+                double salarioBruto = resultSet.getDouble("salarioBruto");
 
-                return new Funcionario(matriculaRetornada, nome, sexo, idade, salario);
+                return new Funcionario(matriculaRetornada, nome, sexo, idade, salarioBruto);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -108,38 +109,130 @@ public class Main {
         return null;
     }
 
+    public static String obterGrauInsalubridade() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Escolha o grau de insalubridade:");
+        System.out.println("1 - Baixo");
+        System.out.println("2 - Médio");
+        System.out.println("3 - Alto");
 
+        int escolha = scanner.nextInt();
+
+        switch (escolha) {
+            case 1:
+                return "Baixo";
+            case 2:
+                return "Médio";
+            case 3:
+                return "Alto";
+            default:
+                return "Sem insalubridade";
+        }
+    }
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5000.00); cadastrarFuncionario(funcionario);
+        while (true) {
+            System.out.println("Escolha a operação:");
+            System.out.println("1 - Cadastrar Funcionário");
+            System.out.println("2 - Excluir Funcionário");
+            System.out.println("3 - Atualizar Funcionário");
+            System.out.println("4 - Buscar Funcionário por Matrícula");
+            System.out.println("5 - Sair");
 
-        // excluirFuncionario(1);
+            int escolha = scanner.nextInt();
 
-        // Funcionario funcionario = new Funcionario(1, "João Silva", "M", 30, 5500.00); atualizarFuncionario(funcionario);
+            switch (escolha) {
+                case 1:
+                    System.out.println("Digite a matrícula do funcionário:");
+                    int matricula = scanner.nextInt();
 
-        /*
-        int matriculaBusca = 1;
-        Funcionario funcionario = buscarFuncionarioPorMatricula(matriculaBusca);
+                    System.out.println("Digite o nome do funcionário:");
+                    String nome = scanner.next();
 
-        if (funcionario != null) {
-            double salarioPorHora = funcionario.calcularSalarioPorHora();
-            System.out.println("O salário por hora do funcionário é: " + salarioPorHora);
-        } else {
-            System.out.println("Funcionário não encontrado.");
+                    System.out.println("Digite o sexo do funcionário (M/F):");
+                    String sexo = scanner.next();
+
+                    System.out.println("Digite a idade do funcionário:");
+                    int idade = scanner.nextInt();
+
+                    System.out.println("Digite o salário bruto do funcionário:");
+                    double salarioBruto = scanner.nextDouble();
+
+                    Funcionario funcionario = new Funcionario(matricula, nome, sexo, idade, salarioBruto);
+
+                    String grauInsalubridade = obterGrauInsalubridade();
+                    funcionario.setGrauInsalubridade(grauInsalubridade);
+
+                    System.out.println("Digite o valor do vale transporte recebido:");
+                    double valorValeTransporte = scanner.nextDouble();
+                    funcionario.inserirValeTransporte(valorValeTransporte);
+
+                    cadastrarFuncionario(funcionario);
+                    break;
+                case 2:
+                    System.out.println("Digite a matrícula do funcionário que deseja excluir:");
+                    int matriculaExclusao = scanner.nextInt();
+                    excluirFuncionario(matriculaExclusao);
+                    break;
+                case 3:
+                    System.out.println("Digite a matrícula do funcionário que deseja atualizar:");
+                    int matriculaAtualizacao = scanner.nextInt();
+                    Funcionario funcionarioAtualizacao = buscarFuncionarioPorMatricula(matriculaAtualizacao);
+                    String grauInsalubridadeAtualizacao = obterGrauInsalubridade();
+                    funcionarioAtualizacao.setGrauInsalubridade(grauInsalubridadeAtualizacao);
+
+                    if (funcionarioAtualizacao != null) {
+                        System.out.println("Funcionário encontrado:");
+                        System.out.println("Nome: " + funcionarioAtualizacao.getNome());
+                        System.out.println("Sexo: " + funcionarioAtualizacao.getSexo());
+                        System.out.println("Idade: " + funcionarioAtualizacao.getIdade());
+                        System.out.println("Salário Bruto Atual: " + funcionarioAtualizacao.getSalarioBruto());
+
+                        System.out.println("Deseja atualizar o salário bruto? (S/N)");
+                        String opcaoAtualizarSalario = scanner.next();
+
+                        if (opcaoAtualizarSalario.equalsIgnoreCase("S")) {
+                            System.out.println("Digite o novo salário bruto do funcionário:");
+                            double novoSalarioBruto = scanner.nextDouble();
+                            funcionarioAtualizacao.setSalarioBruto(novoSalarioBruto);
+                            atualizarFuncionario(funcionarioAtualizacao);
+                        } else {
+                            System.out.println("Salário bruto não atualizado.");
+                        }
+                    } else {
+                        System.out.println("Funcionário não encontrado.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("Digite a matrícula do funcionário que deseja buscar:");
+                    int matriculaBusca = scanner.nextInt();
+                    Funcionario funcionarioBusca = buscarFuncionarioPorMatricula(matriculaBusca);
+
+                    if (funcionarioBusca != null) {
+                        System.out.println("Funcionário encontrado:");
+                        System.out.println("Nome: " + funcionarioBusca.getNome());
+                        System.out.println("Sexo: " + funcionarioBusca.getSexo());
+                        System.out.println("Idade: " + funcionarioBusca.getIdade());
+                        System.out.println("Salário Bruto: " + funcionarioBusca.getSalarioBruto());
+                        double salarioLiquido = calcularSalarioLiquido(funcionarioBusca);
+                        funcionarioBusca.setSalarioLiquido(salarioLiquido);
+                        System.out.println("Salário Líquido: " + funcionarioBusca.getSalarioLiquido());
+                        double salarioPorHora = funcionarioBusca.calcularSalarioPorHora();
+                        System.out.println("Salário por Hora: " + salarioPorHora);
+                    } else {
+                        System.out.println("Funcionário não encontrado.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Saindo do programa.");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Escolha inválida. Tente novamente.");
+            }
         }
-        */
-
-        /*
-        int matriculaBusca = 1; // Substitua pelo número de matrícula do funcionário desejado
-        Funcionario funcionario = buscarFuncionarioPorMatricula(matriculaBusca);
-
-        if (funcionario != null) {
-            double valorPericulosidade = funcionario.calcularPericulosidade();
-            System.out.println("O valor da periculosidade do funcionário é: " + valorPericulosidade);
-        } else {
-            System.out.println("Funcionário não encontrado.");
-        }
-        */
     }
 }
+
