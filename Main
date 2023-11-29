@@ -103,10 +103,9 @@ public class Main {
                 int idade = resultSet.getInt("idade");
                 double salarioBruto = resultSet.getDouble("salarioBruto");
 
-                // aqui voce cria um novo objeto
+
                 Funcionario f = new Funcionario(matriculaRetornada, nome, sexo, idade, salarioBruto);
-                // aqui seto a insalubridade da busca
-                // ai aqui tava ficando null pq quando ia no banco de dados nao tinha valor ai agora salva lá tambem
+
                 f.setGrauInsalubridade(resultSet.getString("grauInsalubridade"));
 
 
