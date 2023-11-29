@@ -216,13 +216,22 @@ public class Main {
                         System.out.println("Sexo: " + funcionarioBusca.getSexo());
                         System.out.println("Idade: " + funcionarioBusca.getIdade());
                         System.out.println("Salário Bruto: " + funcionarioBusca.getSalarioBruto());
-                        double salarioLiquido = calcularSalarioLiquido(funcionarioBusca);
-                        funcionarioBusca.setSalarioLiquido(salarioLiquido);
+
                         double valeAlimentacao = funcionarioBusca.calcularValeAlimentacao();
                         System.out.println("Vale Alimentação: " + valeAlimentacao);
+
                         double descontoINSS = funcionarioBusca.calcularDescontoINSS();
                         System.out.println("Desconto de INSS: " + descontoINSS);
-                        System.out.println("Salário Líquido: " + funcionarioBusca.getSalarioLiquido());
+
+                        double descontoIRRF = funcionarioBusca.calcularDescontoIRRF();
+                        System.out.println("Desconto de IRRF: " + descontoIRRF);
+
+                        double salarioLiquidoSemFGTS = Funcionario.calcularSalarioLiquido(funcionarioBusca, false);
+                        System.out.println("Salário Líquido sem FGTS: " + salarioLiquidoSemFGTS);
+
+                        double salarioLiquidoComFGTS = Funcionario.calcularSalarioLiquido(funcionarioBusca, true);
+                        System.out.println("Salário Líquido com FGTS: " + salarioLiquidoComFGTS);
+
                         double salarioPorHora = funcionarioBusca.calcularSalarioPorHora();
                         System.out.println("Salário por Hora: " + salarioPorHora);
                     } else {
