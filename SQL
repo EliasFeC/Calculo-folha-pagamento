@@ -9,4 +9,8 @@ CREATE TABLE funcionarios (
     salarioBruto DECIMAL(10, 2)
 );
 
+ALTER TABLE funcionarios
+ADD COLUMN data_admissao DATE;
+
+
 SELECT * FROM funcionarios
