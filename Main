@@ -198,8 +198,6 @@ public class Main {
                     System.out.println("Digite a matrícula do funcionário que deseja atualizar:");
                     int matriculaAtualizacao = scanner.nextInt();
                     Funcionario funcionarioAtualizacao = buscarFuncionarioPorMatricula(matriculaAtualizacao);
-                    String grauInsalubridadeAtualizacao = obterGrauInsalubridade();
-                    funcionarioAtualizacao.setGrauInsalubridade(grauInsalubridadeAtualizacao);
 
                     if (funcionarioAtualizacao != null) {
                         System.out.println("Funcionário encontrado:");
