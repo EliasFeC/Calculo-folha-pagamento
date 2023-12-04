@@ -6,7 +6,8 @@ CREATE TABLE funcionarios (
     nome VARCHAR(50),
     sexo CHAR(1),
     idade INT,
-    salarioBruto DECIMAL(10, 2)
+    salarioBruto DECIMAL(10, 2),
+    grauInsalubridade VARCHAR(50)
 );
 
 SELECT * FROM funcionarios
